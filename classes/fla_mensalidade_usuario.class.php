@@ -114,6 +114,47 @@ class fla_mensalidade_usuario {
             return $objConexao->lastInsertId();
         }
     }
+	
+    public function editaPagamento() {
+        $objConexao = new fla_conexao();
+
+        $parametros_where = get_object_vars($this);
+        $parametros_where = array_filter($parametros_where, 'strlen');
+        $tamanho_parametros = count($parametros_where);
+		$update = "";
+        $aux = 1;
+        if (is_array($parametros_where)) {
+            foreach ($parametros_where as $atributo => $valor) {
+				if (($atributo != "cod_mensalidade_usuario")) {
+					if ((!is_null($valor))) {
+						if ($aux != $tamanho_parametros) {
+							$and = " , ";
+						} else {
+							$and = "";
+						}
+
+						if (is_numeric($valor)) {
+							$update .= $atributo . " = '" . $valor . "'" . $and;
+						} else {
+							$update .= $atributo . " = '" . $valor . "'" . $and;
+						}
+					}
+				}
+				$aux++;
+            }
+            try {
+				$SQL = sprintf('UPDATE fla_mensalidade_usuario SET ' . $update . ' WHERE cod_mensalidade_usuario = %s', $this->cod_mensalidade_usuario);
+				$query = $objConexao->prepare($SQL);
+				$query->Execute();
+				return true;
+			} catch (Exception $e) {
+				echo "Erro ao atualizar cliente";
+				echo "<pre>".$SQL."</pre>";
+				return false;
+			}
+        }
+		return false;
+    }	
     
 	public function excluirPagamento() {
 		$objConexao = new fla_conexao();		
@@ -176,7 +217,7 @@ class fla_mensalidade_usuario {
             $where = " where " . $where;
         }
 
-        $SQL = sprintf("select %s from fla_mensalidade_usuario rot %s", $colunas_select, $where);
+        $SQL = sprintf("select %s from fla_mensalidade_usuario rot %s ORDER BY rot.periodo_inicial DESC, rot.data_pagamento DESC ", $colunas_select, $where);
         //echo $SQL;
         $rsClientes = $objConexao->prepare($SQL);
         $rsClientes->execute();

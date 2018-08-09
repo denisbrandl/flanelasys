@@ -147,10 +147,23 @@ $arrMensalidade = $objMensalidade->buscaMensalidade();
             jQuery(function($){   
                 $("#des_placa").mask("aaa-9999");
                 $("#cep_cliente").mask("99999-999");
-                $("#num_telefone").mask("(99) 9999-9999");
-                $("#num_celular").mask("(99) 9999-9999");
-                       
-                
+                $("#num_telefone").mask("(99) 9999-9999");            
+				
+				jQuery("#num_celular")
+					.mask("(99) 9999-9999?9")
+					.focusout(function (event) {  
+						var target, phone, element;  
+						target = (event.currentTarget) ? event.currentTarget : event.srcElement;  
+						phone = target.value.replace(/\D/g, '');
+						element = $(target);  
+						element.unmask();  
+						if(phone.length > 10) {  
+							element.mask("(99) 99999-999?9");  
+						} else {  
+							element.mask("(99) 9999-9999?9");  
+						}  
+					});				
+				
                 $('#excluirCliente').click(function() {
                     var c = confirm("Se excluir o cliente todos os dados relacionados serão excluídos. Continuar?\nProcesso irreversível!");
                     return c;
@@ -198,18 +211,13 @@ $arrMensalidade = $objMensalidade->buscaMensalidade();
                         $("#cpfcnpj").text('CNPJ:');
                         $("#cpf_cnpj_cliente").unmask().mask("99.999.999/9999-99");
                         $(".tr_cnpj").show();
-                        //$("#insc_estadual_cliente").show();
-                        //
                     } else {
                         $("#cpfcnpj").text('CPF:');
                         $("#cpf_cnpj_cliente").unmask().mask("999.999.999-99");
                         $(".tr_cnpj").hide();
-                        //$("#insc_estadual_cliente").hide();
-                        //$("#ie").hide();
                     }
                 });
                 $(window).load(function() {
-                    //$(".tr_cnpj").hide();
                     $("#nom_cliente").focus();
                     $("#nom_cliente").select();
                     $().selecionaTipoDocumento("<?php echo $select_tipo_doc; ?>");
